@@ -10,7 +10,7 @@
 // input data
 int bit_resolution = pow(2, 12);
 Natural_cubic_spline M(5, 500, 1, 1);
-size_t iterations = 1 * pow(10, 4); // number of times to run. More times, more better estimate
+size_t iterations = 2 * pow(10, 5); // number of times to run. More times, more better estimate
 size_t print = iterations / 20;
 double random_chance = 0.2;
 int n_tiles = 3;
@@ -72,9 +72,17 @@ int main()
     // set seed
     randomize();
 
-    std::vector<std::vector<double>> values{{93.7487, -104.413, 6.54582, -33.6192, -100.089},
+    /* std::vector<std::vector<double>> values{{93.7487, -104.413, 6.54582, -33.6192, -100.089},
                                             {94.5345, -108.241, 3.45671, 28.6225, -305.973},
-                                            {99.6374, -116.446, -4.51146, 61.102, -271.405}};
+                                            {99.6374, -116.446, -4.51146, 61.102, -271.405}}; */
+    // nov 3 morning measurements
+    /* std::vector<std::vector<double>> values{{80.8773, -93.5178, 0.418203, 25.94, 23.1023},
+                                            {83.1577, -97.4657, -0.041277, 31.2212, 21.8266},
+                                            {83.628, -98.3216, 0.0269609, 29.0856, 26.5983}}; */
+    // nov 3 morning measurements rerun
+    std::vector<std::vector<double>> values{{86.4084, -107.371, -3.69321, 127.656, -393.183},
+                                            {89.0889, -111.768, -7.23342, 144.546, -411.263},
+                                            {90.8136, -116.597, -3.05034, 154.133, -501.815}};
     // std::vector<double> values{62.65304, -62.09515, 0.0, 0.0, 0.0};
 
     // starting least squares
