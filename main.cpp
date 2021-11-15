@@ -10,7 +10,7 @@
 // input data
 int bit_resolution = pow(2, 12);
 Natural_cubic_spline M(5, 500, 1, 1);
-size_t iterations = 2 * pow(10, 5); // number of times to run. More times, more better estimate
+size_t iterations = 1 * pow(10, 5); // number of times to run. More times, more better estimate
 size_t print = iterations / 20;
 double random_chance = 0.2;
 int n_tiles = 3;
@@ -80,9 +80,17 @@ int main()
                                             {83.1577, -97.4657, -0.041277, 31.2212, 21.8266},
                                             {83.628, -98.3216, 0.0269609, 29.0856, 26.5983}}; */
     // nov 3 morning measurements rerun
-    std::vector<std::vector<double>> values{{86.4084, -107.371, -3.69321, 127.656, -393.183},
+    /* std::vector<std::vector<double>> values{{86.4084, -107.371, -3.69321, 127.656, -393.183},
                                             {89.0889, -111.768, -7.23342, 144.546, -411.263},
-                                            {90.8136, -116.597, -3.05034, 154.133, -501.815}};
+                                            {90.8136, -116.597, -3.05034, 154.133, -501.815}}; */
+    // nov 12 lighting calibration
+    std::vector<std::vector<double>> values{{90.5645, -110.825, -11.1511, 138.974, -380.393},
+                                            {90.6486, -112.128, -10.443, 145.702, -432.13},
+                                            {91.4241, -115.468, -2.89886, 145.405, -511.608}};
+    // nov 12 lighting calibration longer
+    /* std::vector<std::vector<double>> values{{92.343, -114.878, -15.8376, 183.041, -530.145},
+                                            {91.6528, -114.506, -11.794, 164.843, -501.396},
+                                            {90.7346, -114.074, 0.349853, 123.888, -446.572}}; */
     // std::vector<double> values{62.65304, -62.09515, 0.0, 0.0, 0.0};
 
     // starting least squares
