@@ -4,27 +4,39 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include "random_numbers.h"
 #include "natural_cubic_spline.h"
 
 // input data
-int bit_resolution = pow(2, 12);
-Natural_cubic_spline M(5, 500, 1, 1);
-size_t iterations = 1 * pow(10, 5); // number of times to run. More times, more better estimate
-size_t print = iterations / 20;
-double random_chance = 0.2;
-int n_tiles = 3;
+const int bit_resolution = pow(2, 12);
+const Natural_cubic_spline M(5, 500, 1, 1);
+const double random_chance = 0.2;
+const int n_tiles = 3;
 
 double calc(const double &value)
 {
     return (value / (bit_resolution - 1));
 }
 
-int main()
+// from https://stackoverflow.com/questions/29248585/c-checking-command-line-argument-is-integer-or-not
+bool isNumber(char number[])
 {
+    int i = 0;
 
-    std::vector<std::vector<double>> temperatures(3, std::vector<double>(0));
-    std::vector<std::vector<double>> resistances(3, std::vector<double>(0));
+    //checking for negative numbers
+    if (number[0] == '-')
+        return false;
+    for (; number[i] != 0; i++)
+    {
+        //if (number[i] > '9' || number[i] < '0')
+        if (!isdigit(number[i]))
+            return false;
+    }
+    return true;
+}
+
+void read_csv(std::vector<std::vector<double>> &temperatures, std::vector<std::vector<double>> &resistances){
     std::ifstream in("export_data.csv");
     if (!in.is_open())
         throw std::runtime_error("Cannot open input file.");
@@ -66,36 +78,66 @@ int main()
         }
     }
     in.close();
-    std::ofstream myFile("SS.csv");
-    myFile << "Sum of squared diff\n";
+
+
+}
+
+
+int main(int argc, char **argv)
+{
+    size_t iterations = 1 * pow(10, 3); // number of times to run. More times, more better estimate
+    try{
+        if (argc >= 2){
+            // when more than one argument ignore all but the first
+            if( argc > 2){
+                std::cout << "Ignoring all arguments after the first.\n";
+            }
+            if(isNumber(argv[1])){
+                iterations = atoi(argv[1]);
+                if(iterations < 100){
+                    throw std::invalid_argument("Please use a value larger than 100.");
+                }
+            }
+            // if the first argument is not a number throw error
+            else {
+                throw std::invalid_argument(
+                    "The first argument must be a positive number. It defines the number of iterations."
+                    );
+            }
+        }
+    }
+    catch(std::exception& e){
+        std::cerr << "Error: " << e.what() << std::endl;
+        return -1;
+    }
+    const size_t print = static_cast<size_t>(iterations * 0.05);
+    
+    
+    // fill data with input csv file
+    // needs to be called "export_data.csv"
+    std::vector<std::vector<double>> temperatures(3, std::vector<double>(0));
+    std::vector<std::vector<double>> resistances(3, std::vector<double>(0));
+    try{
+        read_csv(temperatures, resistances);
+    }
+    catch(std::exception& e){
+        std::cerr << "Error: " << e.what() << std::endl;
+        return -2;
+    }
+
+    std::ofstream myFile("SLS.csv");
+    myFile << "tileL,tileM,tileR\n";
+
+    std::ofstream final_vals("spline_values.txt");
+    final_vals << "These are the final values for the spline\n";
 
     // set seed
     randomize();
 
-    /* std::vector<std::vector<double>> values{{93.7487, -104.413, 6.54582, -33.6192, -100.089},
-                                            {94.5345, -108.241, 3.45671, 28.6225, -305.973},
-                                            {99.6374, -116.446, -4.51146, 61.102, -271.405}}; */
-    // nov 3 morning measurements
-    /* std::vector<std::vector<double>> values{{80.8773, -93.5178, 0.418203, 25.94, 23.1023},
-                                            {83.1577, -97.4657, -0.041277, 31.2212, 21.8266},
-                                            {83.628, -98.3216, 0.0269609, 29.0856, 26.5983}}; */
-    // nov 3 morning measurements rerun
-    /* std::vector<std::vector<double>> values{{86.4084, -107.371, -3.69321, 127.656, -393.183},
-                                            {89.0889, -111.768, -7.23342, 144.546, -411.263},
-                                            {90.8136, -116.597, -3.05034, 154.133, -501.815}}; */
-    // nov 12 lighting calibration
-    /*std::vector<std::vector<double>> values{{91.5645, -110.825, -11.1511, 138.974, -380.393},
-                                            {91.6486, -112.128, -10.443, 145.702, -432.13},
-                                            {92.4241, -115.468, -2.89886, 145.405, -511.608}};*/
-    // nov 24 lighting calibrationi
-    std::vector<std::vector<double>> values{{92.7909, -114.518, -16.4848, 188.65, -489.128},
-                                            {92.16, -114.753, -10.9084, 167.122, -466.631},
-                                            {91.4206, -114.662, 0.254665, 131.026, -410.598}};
     // nov 24 lighting calibration longer
-    /* std::vector<std::vector<double>> values{{90.9348, -110.377, -13.5972, 154.813, -367.34},
-                                            {91.7481, -113.896, -9.66779, 157.396, -434.227},
-                                            {91.3945, -114.535, 0.281154, 128.897, -396.786}}; */
-    // std::vector<double> values{62.65304, -62.09515, 0.0, 0.0, 0.0};
+    std::vector<std::vector<double>> values{{90.0, -100.0, 0.0, 0.0, 0.0},
+                                            {90.0, -100.0, 0.0, 0.0, 0.0},
+                                            {90.0, -100.0, 0.0, 0.0, 0.0}}; 
 
     // starting least squares
     std::vector<double> sum_start = {0.0, 0.0, 0.0};
@@ -155,19 +197,20 @@ int main()
                 sum_start[t] = sum_end[t];
             }
         }
-        // keep old or replace with new
 
+        // keep old or replace with new
         for (int t = 0; t < n_tiles; t++)
         {
-            myFile << sum_start[t] << ",";
+            myFile << sum_start[t] << ((t < n_tiles - 1) ? ",": "");
         }
         myFile << "\n";
+
         // output progress
         if (i % print == 0)
         {
             // Print on the screen some message
             std::cout << "Done: "
-                      << (static_cast<double>(i) / static_cast<double>(iterations)) * 100.0
+                      << round((static_cast<double>(i) / static_cast<double>(iterations)) * 100.0)
                       << "%, SLS = " << sum_start[0];
             for (int t = 1; t < n_tiles; t++)
             {
@@ -182,12 +225,17 @@ int main()
     for (int t = 0; t < n_tiles; t++)
     {
         std::cout << "\t";
+        final_vals << "tile " << t + 1 << ": ";
         for (size_t j = 0; j < values[t].size(); j++)
         {
             std::cout << values[t][j] << ", ";
+            final_vals << values[t][j] << ", ";
         }
         std::cout << "SLS = " << sum_start[t]
                   << std::endl;
+        final_vals << "SLS = " << sum_start[t]
+                  << std::endl;
     }
+    
     return 0;
 }
