@@ -56,7 +56,7 @@ or on Windows
 calibrate.exe ITERATIONS
 ```
 
-Where `ITERATIONS` should be a positive whole number. The larger the number the more accurate the result will be and the longer it will take to run.
+Where `ITERATIONS` should be a positive whole number. The larger the number the more accurate the result will be and the longer it will take to run. The default value for `ITERATIONS` is 1000.
 
 ### Output
 
